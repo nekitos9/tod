@@ -7,7 +7,7 @@
     "node": ">=24.19.0 <25"
   },
   "scripts": {
-    "import:data": "node scripts/import-game-data.ts",
+    "import:data": "node scripts/import-game-data.ts && node scripts/import-phone-data.ts",
     "predev": "npm run import:data",
     "dev": "vite",
     "prebuild": "npm run import:data",
@@ -17,7 +17,7 @@
     "pretest": "npm run import:data",
     "test": "vitest run",
     "test:e2e": "playwright test",
-    "test:e2e:pwa": "npm run build && E2E_PWA=true E2E_BASE_URL=http://127.0.0.1:4184/ToD/ E2E_SERVER_COMMAND='npm run preview -- --host 127.0.0.1 --port 4184' playwright test tests/e2e/pwa.spec.ts",
+    "test:e2e:pwa": "npm run build && node scripts/test-pwa.ts",
     "test:importer": "vitest run scripts/xlsx/importer.test.ts",
     "test:watch": "vitest",
     "pretypecheck": "npm run import:data",

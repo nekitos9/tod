@@ -2,9 +2,9 @@ import { expect, test, type Page } from '@playwright/test'
 import { readFileSync, readdirSync, writeFileSync } from 'node:fs'
 import { join, relative } from 'node:path'
 
-test('production output has valid /ToD/ PWA metadata and no development materials', async ({ page }) => {
+test('production output has valid /tod/ PWA metadata and no development materials', async ({ page }) => {
   await page.goto('./')
-  await expect(page).toHaveURL(/\/ToD\/$/)
+  await expect(page).toHaveURL(/\/tod\/$/)
   await expect(page.getByRole('heading', { name: 'Правда или Действие' })).toBeVisible()
 
   const manifest = await page.evaluate(async () => {
@@ -13,12 +13,12 @@ test('production output has valid /ToD/ PWA metadata and no development material
     const response = await fetch(href)
     return { body: await response.json(), contentType: response.headers.get('content-type'), href }
   })
-  expect(manifest.href).toMatch(/\/ToD\/manifest\.webmanifest$/)
+  expect(manifest.href).toMatch(/\/tod\/manifest\.webmanifest$/)
   expect(manifest.contentType).toContain('manifest')
   expect(manifest.body).toMatchObject({
     display: 'standalone',
-    scope: '/ToD/',
-    start_url: '/ToD/',
+    scope: '/tod/',
+    start_url: '/tod/',
     theme_color: '#427cbe',
   })
   expect(manifest.body.icons).toEqual(expect.arrayContaining([
@@ -33,7 +33,7 @@ test('production output has valid /ToD/ PWA metadata and no development material
   }
 
   await waitForServiceWorker(page)
-  expect(await page.evaluate(() => navigator.serviceWorker.controller?.scriptURL)).toMatch(/\/ToD\/sw\.js$/)
+  expect(await page.evaluate(() => navigator.serviceWorker.controller?.scriptURL)).toMatch(/\/tod\/sw\.js$/)
 
   const files = listFiles('dist')
   expect(files).not.toEqual(expect.arrayContaining([

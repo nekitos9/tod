@@ -3,7 +3,7 @@ import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  base: '/ToD/',
+  base: '/tod/',
   plugins: [
     react(),
     VitePWA({
@@ -20,9 +20,9 @@ export default defineConfig({
         lang: 'ru',
         name: 'Правда или Действие',
         orientation: 'any',
-        scope: '/ToD/',
+        scope: '/tod/',
         short_name: 'П или Д',
-        start_url: '/ToD/',
+        start_url: '/tod/',
         theme_color: '#427cbe',
       },
       registerType: 'autoUpdate',

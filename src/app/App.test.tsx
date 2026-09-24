@@ -447,10 +447,11 @@ describe('App', () => {
       render(<App />)
       startGame({ pack: 'Другие люди' })
       fireEvent.click(screen.getByRole('button', { name: 'Действие' }))
-      const number = screen.getByText(/\+7 \(900\) 000-00-00/).textContent
+      const phonePattern = /\+7 \(9\d{2}\) \d{3}-\d{2}-\d{2}/
+      const number = screen.getByText(phonePattern).textContent
       fireEvent.click(screen.getByRole('button', { name: 'Выход' }))
       fireEvent.click(screen.getByRole('button', { name: 'Нет' }))
-      expect(screen.getByText(/\+7 \(900\) 000-00-00/)).toHaveTextContent(number ?? '')
+      expect(screen.getByText(phonePattern)).toHaveTextContent(number ?? '')
     } finally {
       random.mockRestore()
     }

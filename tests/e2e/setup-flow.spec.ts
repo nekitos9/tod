@@ -227,26 +227,48 @@ test('keeps focus trapped and restores it for setup and game dialogs', async ({ 
 test('enters Packs and selects a pack without mouse or Tab', async ({ page }) => {
   await page.goto('/')
   await page.keyboard.press('ArrowDown')
+  await expect(page.getByRole('button', { name: 'Начать' })).toBeFocused()
   await page.keyboard.press('Enter')
+  await expect(page.getByRole('heading', { name: 'Правила игры' })).toBeVisible()
   await page.keyboard.press('ArrowDown')
+  await expect(page.getByRole('checkbox', { name: /От заданий нельзя отказываться/ })).toBeFocused()
   await page.keyboard.press('ArrowDown')
+  await expect(page.getByRole('checkbox', { name: /У пользователя есть право пропустить/ })).toBeFocused()
   await page.keyboard.press('ArrowDown')
+  await expect(page.getByRole('checkbox', { name: /Безлимитная «Перезадать»/ })).toBeFocused()
+  await expect(page.getByRole('checkbox', { name: /Штраф на «Перезадать»/ })).toBeDisabled()
+  await page.keyboard.press('ArrowDown')
+  await expect(page.getByRole('button', { name: 'Назад' })).toBeFocused()
   await page.keyboard.press('ArrowRight')
+  await expect(page.getByRole('button', { name: 'Далее' })).toBeFocused()
   await page.keyboard.press('Enter')
+  await expect(page.getByRole('heading', { name: 'Игроки' })).toBeVisible()
 
+  const names = page.getByRole('textbox', { name: 'Имя игрока' })
+  const boundaries = page.getByRole('combobox', { name: 'Грань игрока' })
   await page.keyboard.press('ArrowDown')
+  await expect(page.getByRole('button', { name: 'Открыть справку о настройках игроков' })).toBeFocused()
   await page.keyboard.press('ArrowDown')
+  await expect(names.nth(0)).toBeFocused()
   await page.keyboard.type('Первый')
+  await expect(names.nth(0)).toHaveValue('Первый')
   await page.keyboard.press('ArrowDown')
+  await expect(boundaries.nth(0)).toBeFocused()
   await chooseFirstSelectOption(page)
+  await expect(boundaries.nth(0)).toHaveValue('virgin')
   await page.keyboard.press('ArrowRight')
   await page.keyboard.press('ArrowRight')
   await page.keyboard.press('ArrowUp')
+  await expect(names.nth(1)).toBeFocused()
   await page.keyboard.type('Второй')
+  await expect(names.nth(1)).toHaveValue('Второй')
   await page.keyboard.press('ArrowDown')
+  await expect(boundaries.nth(1)).toBeFocused()
   await chooseFirstSelectOption(page)
+  await expect(boundaries.nth(1)).toHaveValue('virgin')
 
   const playersNext = page.getByRole('button', { name: 'Далее' })
+  await expect(playersNext).toBeEnabled()
   for (let step = 0; step < 8 && !(await playersNext.evaluate((element) => element === document.activeElement)); step += 1) {
     await page.keyboard.press('ArrowDown')
   }
@@ -450,7 +472,12 @@ test('keeps very long player names readable and usable at mobile text scaling', 
   await page.getByRole('button', { name: 'Действие' }).click()
   await assertNoHorizontalOverflow(page)
   await expect(page.getByRole('button', { name: 'Готово' })).toBeVisible()
-  expect(await page.locator('.game-card h2').evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true)
+  const playerHeading = page.getByRole('heading', {
+    name: 'СверхдлинноеИмяИгрокаБезЕдиногоПробелаКотороеДолжноПереноситься',
+    exact: true,
+  })
+  await expect(playerHeading).toBeVisible()
+  await expect.poll(() => playerHeading.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true)
 })
 
 test('skips a generated card with a keyboard-only reason dialog flow', async ({ page }) => {

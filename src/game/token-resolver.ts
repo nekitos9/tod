@@ -1,5 +1,8 @@
 import type { ActiveGamePlayer } from './game-state'
-import { nextRandom, type RandomSource } from './random'
+import type { RandomSource } from './random'
+import { generatePhoneNumber } from './phone-number'
+
+export { generatePhoneNumber } from './phone-number'
 
 export interface ResolvedCardText {
   readonly phoneNumber: string | null
@@ -15,8 +18,9 @@ export function resolveCardTokens(
   text: string,
   participants: readonly ActiveGamePlayer[],
   random: RandomSource,
+  now = new Date(),
 ): ResolvedCardText {
-  const phoneNumber = text.includes('*PHONE_NUM*') ? generatePhoneNumber(random) : null
+  const phoneNumber = text.includes('*PHONE_NUM*') ? generatePhoneNumber(random, now) : null
   const segments: ResolvedTextSegment[] = []
   const pattern = /\*(PLAYER(\d*)|PHONE_NUM)\*/g
   let cursor = 0
@@ -36,9 +40,4 @@ export function resolveCardTokens(
   }
   if (cursor < text.length) segments.push({ kind: 'text', text: text.slice(cursor) })
   return { phoneNumber, segments, text: segments.map((segment) => segment.text).join('') }
-}
-
-export function generatePhoneNumber(random: RandomSource): string {
-  const digits = Array.from({ length: 9 }, () => Math.floor(nextRandom(random) * 10))
-  return `+7 (9${digits[0]}${digits[1]}) ${digits[2]}${digits[3]}${digits[4]}-${digits[5]}${digits[6]}-${digits[7]}${digits[8]}`
 }

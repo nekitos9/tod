@@ -1,0 +1,12 @@
+Phone numbering data: Russian Ministry of Digital Development open numbering registry
+https://opendata.digital.gov.ru/registry/numeric/downloads
+Open data terms: https://opendata.digital.gov.ru/terms/
+
+Derived snapshot: DimmKG/ru-phone-base, built 2026-09-04T03:18:16.748Z
+https://github.com/DimmKG/ru-phone-base/tree/40d0bb24311f294073ee6715227a496647fafcd6
+Copyright (c) 2026 Dmitrii Petrov. Dataset use terms and source code license:
+https://github.com/DimmKG/ru-phone-base/blob/40d0bb24311f294073ee6715227a496647fafcd6/LICENSE
+
+This application extracts mobile regional allocations, merges adjacent ranges,
+and selects numbers using the region's estimated local time. It does not verify
+that a number is active or determine its owner's current location.

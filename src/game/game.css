@@ -206,11 +206,13 @@
 
 @media (min-width: 900px) and (max-height: 820px) {
   .game-shell {
+    height: 100dvh;
     padding-top: 32px;
     padding-bottom: 32px;
-    grid-template-rows: auto min(516px, calc(100dvh - 130px));
+    grid-template-rows: auto minmax(0, 1fr);
     gap: 20px;
   }
+  .game-card-stage, .game-actions { max-height: 516px; }
   .game-header h1 { font-size: 38px; }
   .game-header p { margin-top: 3px; }
   .game-actions { gap: 12px; }

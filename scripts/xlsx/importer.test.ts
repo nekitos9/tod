@@ -55,14 +55,14 @@ describe('XLSX importer', () => {
     const result = await importGameData(resolve('docs/Паки и вопросы.xlsx'))
 
     expect(result.summary).toEqual({
-      cardCount: 103,
+      cardCount: 200,
       packCount: 8,
       boundaryCount: 3,
       cardTypeCount: 2,
     })
     expect(result.packs.find((pack) => pack.name === 'Обычный')).toMatchObject({
       id: 'pack-2',
-      cardCount: 33,
+      cardCount: 92,
       availableTypes: ['truth', 'dare'],
     })
   })

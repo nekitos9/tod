@@ -1,0 +1,49 @@
+import type { PhoneRangeGroup } from '../data/phone-data'
+import { phoneRangeGroups } from '../generated/phone-data'
+import { nextRandom, type RandomSource } from './random'
+
+const formatters = new Map<string, Intl.DateTimeFormat>()
+
+export function isPhoneDaytime(timeZones: readonly string[], now: Date): boolean {
+  if (!timeZones.length || !Number.isFinite(now.getTime())) return false
+  return timeZones.every((timeZone) => {
+    try {
+      let formatter = formatters.get(timeZone)
+      if (!formatter) {
+        formatter = new Intl.DateTimeFormat('en-GB', { timeZone, hour: '2-digit', hourCycle: 'h23' })
+        formatters.set(timeZone, formatter)
+      }
+      const hour = Number(formatter.formatToParts(now).find((part) => part.type === 'hour')?.value)
+      return hour >= 9 && hour < 21
+    } catch {
+      // Older browsers may lack a timezone; do not treat it as the user's zone.
+      return false
+    }
+  })
+}
+
+export function generatePhoneNumber(
+  random: RandomSource,
+  now = new Date(),
+  groups: readonly PhoneRangeGroup[] = phoneRangeGroups,
+): string {
+  const daytime = groups.filter((group) => isPhoneDaytime(group.timeZones, now))
+  // User-approved fallback: still supply a number when every known region is asleep.
+  const pool = daytime.length ? daytime : groups
+  const capacity = pool.reduce((sum, group) =>
+    sum + group.ranges.reduce((total, [start, end]) => total + end - start + 1, 0), 0)
+  if (!capacity) throw new Error('База телефонных диапазонов пуста')
+  // Weight by number capacity, not by how many blocks an operator split it into.
+  let offset = Math.floor(nextRandom(random) * capacity)
+  for (const group of pool) {
+    for (const [start, end] of group.ranges) {
+      const size = end - start + 1
+      if (offset < size) {
+        const digits = String(start + offset)
+        return `+7 (${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 8)}-${digits.slice(8, 10)}`
+      }
+      offset -= size
+    }
+  }
+  throw new Error('Не удалось выбрать номер из диапазона')
+}
