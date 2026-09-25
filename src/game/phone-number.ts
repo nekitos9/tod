@@ -49,3 +49,13 @@ export function generatePhoneNumber(
   }
   throw new Error('Не удалось выбрать номер из диапазона')
 }
+
+/** Keep a displayed number unless its region is now asleep and a daytime alternative exists. */
+export function refreshPhoneNumber(phone: string, random: RandomSource, now = new Date()): string {
+  const number = Number(phone.replace(/\D/g, '').slice(1))
+  const current = phoneRangeGroups.find((group) => group.ranges.some(([start, end]) => number >= start && number <= end))
+  if (current && isPhoneDaytime(current.timeZones, now)) return phone
+  const daytime = phoneRangeGroups.filter((group) => isPhoneDaytime(group.timeZones, now))
+  // Preserve the approved random fallback rather than changing it every minute.
+  return daytime.length ? generatePhoneNumber(random, now, daytime) : phone
+}

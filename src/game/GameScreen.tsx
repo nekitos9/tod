@@ -28,6 +28,7 @@ import {
 } from './game-state'
 import './game.css'
 import { getSkipNotice } from './skip-notice'
+import { refreshTurnPhone } from './refresh-turn-phone'
 
 interface GameScreenProps {
   readonly animateEntrance?: boolean
@@ -46,6 +47,23 @@ type CardTransition =
 type NoticeState = 'hidden' | 'visible' | 'closing'
 
 export function GameScreen({ animateEntrance = false, game, onExit, onGameChange }: GameScreenProps) {
+  useEffect(() => {
+    if (!game.currentTurn?.phoneNumber) return
+    function refresh() {
+      if (document.visibilityState === 'hidden') return
+      const next = refreshTurnPhone(game)
+      if (next !== game) onGameChange(next)
+    }
+    refresh()
+    const timer = window.setInterval(refresh, 60_000)
+    document.addEventListener('visibilitychange', refresh)
+    window.addEventListener('focus', refresh)
+    return () => {
+      window.clearInterval(timer)
+      document.removeEventListener('visibilitychange', refresh)
+      window.removeEventListener('focus', refresh)
+    }
+  }, [game, onGameChange])
   const [exitStage, setExitStage] = useState<ExitStage>('closed')
   const [skipDialogOpen, setSkipDialogOpen] = useState(false)
   const [replacementDialogOpen, setReplacementDialogOpen] = useState(false)

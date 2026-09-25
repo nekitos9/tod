@@ -62,14 +62,17 @@ export function PacksScreen({ animateTransition, onBack, onSetupChange, onStart,
     const inputs = [...event.currentTarget.querySelectorAll<HTMLInputElement>('.pack-card input')]
     const currentIndex = inputs.indexOf(event.target)
     if (currentIndex < 0) return
-    const columns = getComputedStyle(event.currentTarget).gridTemplateColumns.split(' ').length
+    // Count the rendered row: old webOS uses flex, not CSS Grid.
+    const cards = [...event.currentTarget.querySelectorAll<HTMLElement>('.pack-card')]
+    const firstTop = cards[0]?.getBoundingClientRect().top
+    const columns = Math.max(1, cards.filter((card) => Math.abs(card.getBoundingClientRect().top - firstTop!) < 2).length)
     const step = event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : event.key === 'ArrowUp' ? -columns : columns
     const currentColumn = currentIndex % columns
     let nextIndex = currentIndex + step
 
     while (nextIndex >= 0 && nextIndex < inputs.length) {
-      if (event.key === 'ArrowLeft' && nextIndex % columns >= currentColumn) return
-      if (event.key === 'ArrowRight' && nextIndex % columns <= currentColumn) return
+      if (event.key === 'ArrowLeft' && nextIndex % columns >= currentColumn) break
+      if (event.key === 'ArrowRight' && nextIndex % columns <= currentColumn) break
       if (!inputs[nextIndex].disabled) {
         event.preventDefault()
         focusAndReveal(inputs[nextIndex])
@@ -77,6 +80,8 @@ export function PacksScreen({ animateTransition, onBack, onSetupChange, onStart,
       }
       nextIndex += step
     }
+    // A horizontal row edge must not fall through to page-level navigation.
+    if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') event.preventDefault()
   }
 
   return (

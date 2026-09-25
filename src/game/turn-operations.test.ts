@@ -14,6 +14,24 @@ import {
 import { selectSecondaryParticipants } from './participants'
 import type { RandomSource } from './random'
 import { generatePhoneNumber, resolveCardTokens } from './token-resolver'
+import { refreshTurnPhone } from './refresh-turn-phone'
+
+it('refreshes only the phone in a restored turn without consuming a card or changing participants', () => {
+  const phone = '+7 (962) 216-49-82'
+  const base = makeGame()
+  const game: ActiveGameState = { ...base, currentTurn: {
+    cardId: 'saved', type: 'dare', secondaryPlayerIds: ['p2'], phoneNumber: phone,
+    resolvedText: `Позвони ${phone}, затем ${phone}`,
+    renderSegments: [{ kind: 'text', text: `Позвони ${phone}, затем ${phone}` }],
+  } }
+  const updated = refreshTurnPhone(game, new Date('2026-09-26T12:00:00+03:00'), fixedRandom(0))
+  expect(updated.currentTurn!.phoneNumber).not.toBe(phone)
+  expect(updated.currentTurn!.resolvedText).toBe(`Позвони ${updated.currentTurn!.phoneNumber}, затем ${updated.currentTurn!.phoneNumber}`)
+  expect(updated.currentTurn!.renderSegments[0].text).toBe(updated.currentTurn!.resolvedText)
+  expect({ ...updated, currentTurn: null }).toEqual({ ...game, currentTurn: null })
+  expect(updated.currentTurn!.secondaryPlayerIds).toBe(game.currentTurn!.secondaryPlayerIds)
+  expect(refreshTurnPhone(updated, new Date('2026-09-26T12:01:00+03:00'), fixedRandom(0.9))).toBe(updated)
+})
 
 const boundaries: BoundaryDefinition[] = [
   { description: '', level: 0, name: 'Целочка' },

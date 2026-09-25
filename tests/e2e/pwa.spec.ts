@@ -98,9 +98,10 @@ test('legacy bundle starts and plays without Array.at or dynamic viewport units'
   }
 })
 
-test('webOS 3 compatibility renders without CSS variables, Grid and newer DOM APIs', async ({ browser, baseURL }, testInfo) => {
+for (const viewport of [{ width: 1280, height: 720 }, { width: 1920, height: 1080 }]) {
+test(`webOS 3 compatibility renders without CSS variables, Grid and newer DOM APIs at ${viewport.width}`, async ({ browser, baseURL }, testInfo) => {
   test.setTimeout(90_000)
-  const context = await browser.newContext({ baseURL, serviceWorkers: 'block', viewport: { width: 1280, height: 720 } })
+  const context = await browser.newContext({ baseURL, serviceWorkers: 'block', viewport })
   try {
     await context.addInitScript(() => {
       CSS.supports = () => false
@@ -141,6 +142,12 @@ test('webOS 3 compatibility renders without CSS variables, Grid and newer DOM AP
     await page.getByRole('button', { name: 'Добавить игрока' }).click()
     await page.getByRole('button', { name: 'Удалить последнего игрока' }).click()
     await expect(page.getByRole('textbox', { name: 'Имя игрока' })).toHaveCount(2)
+    const centered = await page.locator('.round-action').evaluateAll((buttons) => buttons.every((button) => {
+      const style = getComputedStyle(button, '::before')
+      return Math.abs(parseFloat(style.left) - button.clientWidth / 2) < 1 &&
+        Math.abs(parseFloat(style.top) - button.clientHeight / 2) < 1
+    }))
+    expect(centered).toBe(true)
     await page.getByRole('button', { name: 'Открыть справку о настройках игроков' }).click()
     await expect(page.getByRole('dialog')).toBeVisible()
     await page.getByRole('button', { name: 'Ясно' }).click()
@@ -151,15 +158,31 @@ test('webOS 3 compatibility renders without CSS variables, Grid and newer DOM AP
     }
     await page.screenshot({ path: testInfo.outputPath('old-tv-players.png') })
     await page.getByRole('button', { name: 'Далее' }).click()
+    const packs = page.locator('.pack-card input')
+    const rowPairs = await page.locator('.pack-card').evaluateAll((cards) => cards.flatMap((card, index) => {
+      if (!index || Math.abs(card.getBoundingClientRect().top - cards[index - 1].getBoundingClientRect().top) > 2) return []
+      return [index]
+    }))
+    for (const index of rowPairs) {
+      await packs.nth(index).focus()
+      await page.keyboard.press('ArrowLeft')
+      await expect(packs.nth(index - 1)).toBeFocused()
+    }
     await page.getByRole('checkbox', { name: 'Другие люди' }).check({ force: true })
     await page.getByRole('button', { name: 'Далее' }).click()
+    await expect(page.getByRole('button', { name: 'Готово' })).toBeDisabled()
+    const choice = await page.getByRole('button', { name: 'Действие', exact: true }).boundingBox()
+    expect(choice && choice.x >= 0 && choice.y >= 0 && choice.y + choice.height < viewport.height).toBe(true)
     await page.getByRole('button', { name: 'Действие', exact: true }).focus()
     await page.keyboard.press('Enter')
+    await expect(page.getByRole('button', { name: 'Готово' })).toBeEnabled()
     const before = await persistedGame(page)
     expect(before.currentTurn?.phoneNumber).toMatch(/^\+7 \(9\d{2}\) \d{3}-\d{2}-\d{2}$/)
     await page.screenshot({ path: testInfo.outputPath('old-tv-game.png') })
     const card = await page.locator('.game-card:not([aria-hidden])').boundingBox()
     expect(card && card.width > 400 && card.height > 300).toBe(true)
+    const actions = await page.locator('.game-actions').boundingBox()
+    expect(actions && card && actions.x >= card.x + card.width && actions.y + actions.height <= viewport.height).toBe(true)
     await page.reload()
     await page.getByRole('button', { name: 'Продолжить' }).click()
     expect(await persistedGame(page)).toEqual(before)
@@ -173,6 +196,7 @@ test('webOS 3 compatibility renders without CSS variables, Grid and newer DOM AP
     await context.close()
   }
 })
+}
 
 test('automatic gameplay reaches Results while the browser is offline', async ({ context, page }) => {
   await page.goto('./')

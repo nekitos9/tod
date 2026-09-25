@@ -36,6 +36,15 @@ export function FocusRegion({ children }: PropsWithChildren) {
 
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.defaultPrevented) return
+    if (event.key === 'Enter' && event.target instanceof HTMLInputElement &&
+      event.target.type === 'text' && document.documentElement.classList.contains('old-tv')) {
+      // Re-enter native editing from a remote's OK key, within the user gesture.
+      // Focusing an already focused field alone does not reopen some TV IMEs.
+      event.target.blur()
+      event.target.focus()
+      event.target.click()
+      return
+    }
     if (
       event.key === 'Enter' &&
       event.target instanceof HTMLInputElement &&

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { PhoneRangeGroup } from '../data/phone-data'
 import { phoneRangeGroups } from '../generated/phone-data'
-import { generatePhoneNumber, isPhoneDaytime } from './phone-number'
+import { generatePhoneNumber, isPhoneDaytime, refreshPhoneNumber } from './phone-number'
 
 const groups: readonly PhoneRangeGroup[] = [
   { regions: ['Москва'], timeZones: ['Europe/Moscow'], ranges: [[9000100000, 9000100002]] },
@@ -9,6 +9,23 @@ const groups: readonly PhoneRangeGroup[] = [
 ]
 const random = (value: number) => ({ next: () => value })
 const nationalNumber = (phone: string) => Number(phone.replace(/\D/g, '').slice(1))
+
+describe('displayed phone freshness', () => {
+  const kamchatka = '+7 (962) 216-49-82'
+  it('identifies the reported number by its full range and keeps it at 01:05 Moscow', () => {
+    const group = phoneRangeGroups.find((item) => item.ranges.some(([a, b]) => 9622164982 >= a && 9622164982 <= b))!
+    expect(group.regions).toEqual(['Камчатский край'])
+    expect(refreshPhoneNumber(kamchatka, random(0), new Date('2026-09-26T01:05:00+03:00'))).toBe(kamchatka)
+  })
+  it('replaces a saved number when its destination has entered the night', () => {
+    const now = new Date('2026-09-26T12:00:00+03:00') // Kamchatka 21:00
+    const updated = refreshPhoneNumber(kamchatka, random(0), now)
+    expect(updated).not.toBe(kamchatka)
+    const group = phoneRangeGroups.find((item) => item.ranges.some(([a, b]) => nationalNumber(updated) >= a && nationalNumber(updated) <= b))!
+    expect(isPhoneDaytime(group.timeZones, now)).toBe(true)
+    expect(refreshPhoneNumber(updated, random(0.9), now)).toBe(updated)
+  })
+})
 
 describe('phone time window', () => {
   it.each([

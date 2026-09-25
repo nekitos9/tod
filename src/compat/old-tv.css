@@ -40,6 +40,8 @@ html.old-tv { background: #427cbe; color: #fff; font-family: 'Brygada 1918', Geo
 .old-tv .players__actions { display: flex; justify-content: center; }
 .old-tv .players__actions > * + * { margin-left: 20px; }
 .old-tv .round-action, .old-tv .players__help, .old-tv .players-help__close { display: flex; align-items: center; justify-content: center; }
+.old-tv .round-action::before, .old-tv .round-action--add::after { left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.old-tv .round-action--add::after { transform: translate(-50%, -50%) rotate(90deg); }
 .old-tv .players__help { top: 40px; right: 60px; }
 .old-tv .game-mode { display: flex; align-items: center; justify-content: center; }
 .old-tv .game-mode > * + * { margin-left: 10px; }
@@ -63,11 +65,13 @@ html.old-tv { background: #427cbe; color: #fff; font-family: 'Brygada 1918', Geo
 .old-tv .game-screen--spicy { background: #9242be; }
 .old-tv .game-screen--hot { background: #be4244; }
 .old-tv .game-screen--underworld { background: #111; }
-.old-tv .game-shell { display: flex; flex-wrap: wrap; align-content: flex-start; width: calc(100% - 100px); max-width: 1240px; height: auto; min-height: 100vh; padding: 32px 0; }
+.old-tv .game-shell { display: block; width: calc(100% - 100px); max-width: 1240px; height: auto; min-height: 100vh; padding: 32px 0; }
+.old-tv .game-shell::after { content: ''; display: block; clear: both; }
 .old-tv .game-header { width: 100%; margin-bottom: 24px; }
 .old-tv .game-header h1 { font-size: 40px; }
-.old-tv .game-card-stage { flex: 1; height: calc(100vh - 150px); min-height: 350px; max-height: 516px; }
-.old-tv .game-actions { display: flex; flex-direction: column; width: 260px; height: calc(100vh - 150px); min-height: 350px; max-height: 516px; margin-left: 20px; }
+.old-tv .game-card-stage { float: left; width: calc(100% - 280px); height: calc(100vh - 150px); min-height: 350px; max-height: 516px; }
+.old-tv .game-card { top: 0; right: 0; bottom: 0; left: 0; }
+.old-tv .game-actions { float: right; display: flex; flex-direction: column; width: 260px; height: calc(100vh - 150px); min-height: 350px; max-height: 516px; margin-left: 20px; }
 .old-tv .game-actions .game-action { flex: 1; min-height: 0; padding: 0 16px; gap: 0; }
 .old-tv .game-actions .game-action + .game-action { margin-top: 14px; }
 .old-tv .game-actions .game-action::after { font: 700 24px/1 'El Messiri', Georgia, serif; margin-left: 12px; }
