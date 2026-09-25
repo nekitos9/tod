@@ -30,6 +30,18 @@ dialog {
   font: inherit;
 }
 
+/* Older TV engines have keyboard focus but no :focus-visible selector. */
+@supports not selector(:focus-visible) {
+  button:focus, a:focus, input:focus, select:focus {
+    outline: 3px solid #07963d;
+    outline-offset: 3px;
+  }
+  input[type='checkbox']:focus + span {
+    outline: 3px solid #07963d;
+    outline-offset: 3px;
+  }
+}
+
 button,
 a {
   -webkit-tap-highlight-color: transparent;

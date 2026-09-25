@@ -2,7 +2,7 @@
   position: relative;
   width: 100%;
   min-width: 320px;
-  min-height: 100dvh;
+  min-height: 100vh; min-height: 100dvh;
   overflow: hidden;
   background: var(--color-background-mobile);
   color: var(--color-text);
@@ -34,7 +34,7 @@
 }
 
 .screen__scroll {
-  height: 100dvh;
+  height: 100vh; height: 100dvh;
   overflow-y: auto;
   overscroll-behavior-y: contain;
   scrollbar-gutter: stable;

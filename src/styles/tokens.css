@@ -32,8 +32,15 @@
   --surface-radius: 10px;
   --focus-width: 2px;
   --focus-offset: 2px;
-  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: 0px;
+  --safe-area-top: 0px;
+}
+
+@supports (padding: env(safe-area-inset-top)) {
+  :root {
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-top: env(safe-area-inset-top, 0px);
+  }
 }
 
 @media (min-width: 768px) {

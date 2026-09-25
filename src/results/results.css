@@ -1,6 +1,6 @@
 .results-screen {
   position: relative;
-  min-height: 100dvh;
+  min-height: 100vh; min-height: 100dvh;
   overflow: hidden;
   background: #427cbe;
   color: #fff;
@@ -10,7 +10,7 @@
 .results-screen__scroll {
   position: relative;
   z-index: 1;
-  height: 100dvh;
+  height: 100vh; height: 100dvh;
   padding-bottom: calc(var(--navigation-height) + var(--safe-area-bottom) + 36px);
   overflow-x: hidden;
   overflow-y: auto;

@@ -1,11 +1,15 @@
 import react from '@vitejs/plugin-react'
+import legacy from '@vitejs/plugin-legacy'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
   base: '/tod/',
+  // webOS 6.x (including LG 43UP76906LE) uses Chromium 79.
+  build: { cssTarget: 'chrome79' },
   plugins: [
     react(),
+    legacy({ targets: ['chrome >= 79'] }),
     VitePWA({
       injectRegister: null,
       manifest: {

@@ -1,7 +1,7 @@
 .game-screen {
   --game-background: #427cbe;
   position: relative;
-  min-height: 100dvh;
+  min-height: 100vh; min-height: 100dvh;
   overflow-x: hidden;
   overflow-y: auto;
   background: var(--game-background);
@@ -16,6 +16,7 @@
 
 .game-background {
   position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
@@ -31,11 +32,11 @@
   z-index: 1;
   display: grid;
   width: min(1240px, calc(100% - 58px));
-  min-height: 100dvh;
+  min-height: 100vh; min-height: 100dvh;
   margin: auto;
-  padding: clamp(48px, 8dvh, 82px) 0 40px;
+  padding: clamp(48px, 8vh, 82px) 0 40px; padding: clamp(48px, 8dvh, 82px) 0 40px;
   grid-template: auto 516px / minmax(0, 925px) 295px;
-  gap: clamp(24px, 4dvh, 40px) 20px;
+  gap: clamp(24px, 4vh, 40px) 20px; gap: clamp(24px, 4dvh, 40px) 20px;
   align-content: start;
 }
 
@@ -51,6 +52,7 @@
 
 .game-card {
   position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
   inset: 0;
   display: flex;
   min-height: 0;
@@ -168,8 +170,8 @@
 @media (max-width: 899px) {
   .game-shell {
     width: calc(100% - 58px);
-    min-height: 100dvh;
-    padding: calc(var(--safe-area-top) + clamp(20px, 3.5dvh, 32px)) 0 calc(var(--safe-area-bottom) + 20px);
+    min-height: 100vh; min-height: 100dvh;
+    padding: calc(var(--safe-area-top) + clamp(20px, 3.5vh, 32px)) 0 calc(var(--safe-area-bottom) + 20px); padding: calc(var(--safe-area-top) + clamp(20px, 3.5dvh, 32px)) 0 calc(var(--safe-area-bottom) + 20px);
     grid-template: auto minmax(330px, 1fr) 56px / minmax(0, 1fr);
     gap: 12px;
   }
@@ -178,7 +180,7 @@
   .game-card h2 { padding: 11px 20px 2px; font-size: clamp(30px, 9vw, 36px); line-height: 1.12; }
   .game-card--choosing h2 { padding-top: 13px; }
   .game-card__type { margin: 2px 0 0; font-size: clamp(17px, 4.8vw, 19px); line-height: 1.15; }
-  .game-card__text { padding: clamp(15px, 2.8dvh, 22px) 24px; font-size: clamp(19px, 5.25vw, 22px); }
+  .game-card__text { padding: clamp(15px, 2.8vh, 22px) 24px; padding: clamp(15px, 2.8dvh, 22px) 24px; font-size: clamp(19px, 5.25vw, 22px); }
   .game-card__pack { padding: 9px 18px 17px; font-size: clamp(17px, 4.8vw, 20px); line-height: 1.1; }
   .game-actions { display: flex; justify-content: space-between; gap: 8px; }
   .game-actions .game-action { width: 56px; height: 56px; flex: 0 0 56px; padding: 0; justify-content: center; }
@@ -206,7 +208,7 @@
 
 @media (min-width: 900px) and (max-height: 820px) {
   .game-shell {
-    height: 100dvh;
+    height: 100vh; height: 100dvh;
     padding-top: 32px;
     padding-bottom: 32px;
     grid-template-rows: auto minmax(0, 1fr);

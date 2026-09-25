@@ -53,6 +53,47 @@ test('production output has valid /tod/ PWA metadata and no development material
   expect(readFileSync('playwright.config.ts', 'utf8')).toContain('reuseExistingServer: false')
 })
 
+test('legacy bundle starts and plays without Array.at or dynamic viewport units', async ({ browser, baseURL }) => {
+  // Exercise emitted legacy files, not just a TV user agent in modern Chromium.
+  const context = await browser.newContext({ baseURL, serviceWorkers: 'block', viewport: { width: 1280, height: 720 } })
+  try {
+    await context.addInitScript(() => { Reflect.deleteProperty(Array.prototype, 'at') })
+    await context.route('**/tod/', async (route) => {
+      const response = await route.fetch()
+      const html = (await response.text())
+        .replace(/<script\b[^>]*type="module"[^>]*>[\s\S]*?<\/script>/g, '')
+        .replace(/\snomodule\b/g, '')
+      await route.fulfill({ response, body: html })
+    })
+    await context.route('**/*.css', async (route) => {
+      const response = await route.fetch()
+      const css = (await response.text()).replace(/[\w-]+\s*:[^;{}]*dvh[^;{}]*(;|(?=}))/g, '')
+      await route.fulfill({ response, body: css })
+    })
+    const page = await context.newPage()
+    const errors: string[] = []
+    const scripts: string[] = []
+    page.on('pageerror', (error) => errors.push(error.message))
+    page.on('request', (request) => { if (request.resourceType() === 'script') scripts.push(request.url()) })
+    await page.goto('./')
+    await expect(page.getByRole('heading', { name: 'Правда или Действие' })).toBeVisible()
+    expect(await page.locator('.setup-screen__scroll').evaluate((element) => element.clientHeight)).toBe(720)
+    expect(scripts.some((url) => /index-legacy-/.test(url))).toBe(true)
+    expect(scripts.some((url) => /\/index-(?!legacy-)/.test(url))).toBe(false)
+    expect(await page.evaluate(() => [1, 2].at(-1))).toBe(2)
+    await startGame(page, false, 'Другие люди')
+    await page.getByRole('button', { name: 'Действие', exact: true }).focus()
+    await page.keyboard.press('Enter')
+    await expect(page.locator('.game-card:not([aria-hidden]) .game-card__copy')).toBeVisible()
+    await page.getByRole('button', { name: 'Готово' }).focus()
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('heading', { name: 'Игрок 2' })).toBeVisible()
+    expect(errors).toEqual([])
+  } finally {
+    await context.close()
+  }
+})
+
 test('automatic gameplay reaches Results while the browser is offline', async ({ context, page }) => {
   await page.goto('./')
   await waitForServiceWorker(page)

@@ -18,6 +18,9 @@ export function focusAndReveal(element: HTMLElement) {
     : rect.bottom > bottomLimit ? rect.bottom - bottomLimit : 0
   if (Math.abs(delta) < 1) return
   const options: ScrollToOptions = { behavior: reducedMotion ? 'auto' : 'smooth', top: delta }
-  if (usesElementScroll) scrollContainer!.scrollBy(options)
+  if (!('scrollBehavior' in document.documentElement.style)) {
+    if (usesElementScroll) scrollContainer!.scrollTop += delta
+    else window.scrollBy(0, delta)
+  } else if (usesElementScroll) scrollContainer!.scrollBy(options)
   else window.scrollBy(options)
 }

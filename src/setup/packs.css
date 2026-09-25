@@ -21,7 +21,7 @@
 .packs {
   --packs-gutter: 29px;
   width: 100%;
-  min-height: 100dvh;
+  min-height: 100vh; min-height: 100dvh;
   padding: calc(var(--safe-area-top) + 32px) var(--packs-gutter) 180px;
 }
 
@@ -250,7 +250,7 @@
 }
 
 @media (min-width: 768px) and (max-height: 800px) {
-  .packs { padding-top: clamp(40px, 6dvh, 56px); }
+  .packs { padding-top: clamp(40px, 6vh, 56px); padding-top: clamp(40px, 6dvh, 56px); }
   .packs__grid { margin-top: 24px; }
 }
 

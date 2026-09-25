@@ -15,7 +15,7 @@
   --players-gutter: 29px;
   position: relative;
   width: 100%;
-  min-height: 100dvh;
+  min-height: 100vh; min-height: 100dvh;
   padding: calc(var(--safe-area-top) + 32px) var(--players-gutter) 180px;
 }
 
@@ -320,7 +320,7 @@
 }
 
 .players-help__surface {
-  max-height: calc(100dvh - 287px);
+  max-height: calc(100vh - 287px); max-height: calc(100dvh - 287px);
   padding: 11px 14px 20px;
   overflow-y: auto;
   border-radius: 20px;
@@ -447,10 +447,10 @@
 }
 
 @media (min-width: 768px) and (max-height: 800px) {
-  .players { padding-top: clamp(40px, 6dvh, 56px); }
-  .players__help { top: clamp(51px, 7dvh, 66px); }
+  .players { padding-top: clamp(40px, 6vh, 56px); padding-top: clamp(40px, 6dvh, 56px); }
+  .players__help { top: clamp(51px, 7vh, 66px); top: clamp(51px, 7dvh, 66px); }
   .players__grid { margin-top: 24px; }
-  .players-help__close { top: max(4px, calc(50dvh - 325px)); }
+  .players-help__close { top: max(4px, calc(50vh - 325px)); top: max(4px, calc(50dvh - 325px)); }
 }
 
 .setup-screen--players .bottom-navigation {
