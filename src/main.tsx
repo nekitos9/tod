@@ -15,8 +15,15 @@ if (!rootElement) {
   throw new Error('Root element was not found')
 }
 
-createRoot(rootElement).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
+async function start() {
+  if (!window.CSS || !CSS.supports('display', 'grid') || !CSS.supports('--test', '0')) {
+    await import('./compat/old-tv')
+  }
+  createRoot(rootElement!).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  )
+}
+
+void start()

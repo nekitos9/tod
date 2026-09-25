@@ -1,0 +1,90 @@
+/* Loaded only when CSS Grid/custom properties are unavailable (webOS 3.x).
+   Keep the existing screens and controls; use physical spacing and flex layout. */
+html.old-tv { background: #427cbe; color: #fff; font-family: 'Brygada 1918', Georgia, serif; }
+.old-tv *, .old-tv *::before, .old-tv *::after { animation: none !important; transition: none !important; }
+.old-tv h1, .old-tv h2, .old-tv button, .old-tv .pack-card__header strong { font-family: 'El Messiri', Georgia, serif; }
+.old-tv .setup-screen, .old-tv .screen, .old-tv .results-screen { min-height: 100vh; }
+.old-tv .setup-screen__scroll, .old-tv .screen__scroll, .old-tv .results-screen__scroll { height: 100vh; overflow-y: auto; }
+.old-tv .setup-screen__circle, .old-tv .screen__circle { background: rgba(255,255,255,.08); }
+.old-tv .welcome { min-height: 100vh; padding: 40px 60px 80px; }
+.old-tv .welcome h1, .old-tv .welcome__greeting, .old-tv .welcome__contact, .old-tv .welcome__start, .old-tv .welcome__disclaimer { position: static; width: 100%; max-width: 820px; }
+.old-tv .welcome h1 { margin: 0 0 20px; font-size: 45px; line-height: 1.3; }
+.old-tv .welcome__contact { margin: 24px 0 12px; }
+.old-tv .welcome__start, .old-tv .welcome__disclaimer { width: 400px; }
+.old-tv .welcome__disclaimer { margin-top: 12px; }
+.old-tv .rules, .old-tv .players, .old-tv .packs, .old-tv .screen__inner { padding: 40px 60px 150px; }
+.old-tv .rules h1, .old-tv .players h1, .old-tv .packs h1 { font-size: 40px; }
+.old-tv .rules__settings { display: block; }
+.old-tv .rule-checkbox { display: flex; align-items: flex-start; margin-top: 16px; }
+.old-tv .rule-checkbox input { position: absolute; }
+.old-tv .rule-checkbox__control { display: flex; align-items: center; justify-content: center; flex: 0 0 25px; margin-right: 12px; }
+.old-tv .rule-checkbox > span:last-child { flex: 1; }
+.old-tv .button, .old-tv .icon-button { background: #fff; color: #4269be; border-radius: 40px; font-size: 28px; min-height: 64px; }
+.old-tv .button--truth { background: #0bad29; color: #fff; width: 234px; }
+.old-tv .button--dare { background: #ed1c24; color: #fff; width: 234px; }
+.old-tv .button:disabled, .old-tv .icon-button:disabled { opacity: .4; }
+.old-tv button:focus, .old-tv a:focus, .old-tv input:focus, .old-tv select:focus { outline: 3px solid #07963d; outline-offset: 3px; }
+.old-tv .button--truth:focus { outline-color: #111; }
+.old-tv input[type='checkbox']:focus + span { outline: 3px solid #07963d; outline-offset: 3px; }
+.old-tv .bottom-navigation { height: 114px; padding: 20px 60px 30px; }
+.old-tv .bottom-navigation__inner { height: 64px; max-width: 610px; margin: 0 auto; }
+.old-tv .bottom-navigation__inner > * + * { margin-left: 20px; }
+.old-tv .players__grid, .old-tv .packs__grid, .old-tv .results__list { display: flex; flex-wrap: wrap; margin-left: -10px; margin-right: -10px; }
+.old-tv .player-card, .old-tv .pack-card { width: calc(50% - 20px); flex: 0 0 calc(50% - 20px); margin: 0 10px 20px; }
+.old-tv .player-card { height: 110px; }
+.old-tv .player-card__options { display: flex; align-items: center; justify-content: space-between; }
+.old-tv .player-card__boundary { width: 55%; flex: 1; min-width: 0; font-size: 18px; }
+.old-tv .relationship-toggle { position: relative; display: flex; width: auto; flex: 0 0 auto; margin-left: 12px; font-size: 18px; }
+.old-tv .relationship-toggle__control { margin-left: 8px; }
+.old-tv .relationship-toggle input { position: absolute; right: 5px; }
+.old-tv .players__actions { display: flex; justify-content: center; }
+.old-tv .players__actions > * + * { margin-left: 20px; }
+.old-tv .round-action, .old-tv .players__help, .old-tv .players-help__close { display: flex; align-items: center; justify-content: center; }
+.old-tv .players__help { top: 40px; right: 60px; }
+.old-tv .game-mode { display: flex; align-items: center; justify-content: center; }
+.old-tv .game-mode > * + * { margin-left: 10px; }
+.old-tv .pack-card__header { display: flex; justify-content: space-between; }
+.old-tv .pack-card__header strong { flex: 1; }
+.old-tv .pack-card__types { margin-left: 8px; }
+.old-tv .pack-card__type + .pack-card__type { margin-left: 7px; }
+.old-tv .pack-card__description { padding-top: 10px; }
+.old-tv .dialog { width: 440px; max-width: 90%; color: #171717; }
+.old-tv .dialog::backdrop, .old-tv .players-help::backdrop { background: rgba(24,74,151,.72); }
+.old-tv .dialog__surface { background: #fff; font-family: 'Brygada 1918', Georgia, serif; }
+.old-tv .dialog h2 { border-bottom-color: #b9a0dc; }
+.old-tv .dialog__actions { display: flex; }
+.old-tv .dialog__actions button { flex: 1; color: #4269be; min-width: 0; }
+.old-tv .dialog__actions button + button { margin-left: 10px; }
+.old-tv .players-help { width: 80%; max-width: 1000px; max-height: 90vh; padding: 20px; overflow-y: auto; }
+.old-tv .players-help__surface { max-height: 65vh; overflow-y: auto; background: #fff; color: #111; }
+.old-tv .players-help__close { position: static; margin: 0 0 10px auto; }
+.old-tv .players-help__confirm { margin: 20px auto 0; }
+.old-tv .game-screen { height: 100vh; background: #427cbe; }
+.old-tv .game-screen--spicy { background: #9242be; }
+.old-tv .game-screen--hot { background: #be4244; }
+.old-tv .game-screen--underworld { background: #111; }
+.old-tv .game-shell { display: flex; flex-wrap: wrap; align-content: flex-start; width: calc(100% - 100px); max-width: 1240px; height: auto; min-height: 100vh; padding: 32px 0; }
+.old-tv .game-header { width: 100%; margin-bottom: 24px; }
+.old-tv .game-header h1 { font-size: 40px; }
+.old-tv .game-card-stage { flex: 1; height: calc(100vh - 150px); min-height: 350px; max-height: 516px; }
+.old-tv .game-actions { display: flex; flex-direction: column; width: 260px; height: calc(100vh - 150px); min-height: 350px; max-height: 516px; margin-left: 20px; }
+.old-tv .game-actions .game-action { flex: 1; min-height: 0; padding: 0 16px; gap: 0; }
+.old-tv .game-actions .game-action + .game-action { margin-top: 14px; }
+.old-tv .game-actions .game-action::after { font: 700 24px/1 'El Messiri', Georgia, serif; margin-left: 12px; }
+.old-tv .game-card__text { display: flex; align-items: center; justify-content: center; padding: 20px 36px; }
+.old-tv .game-card__text mark, .old-tv .results__player strong { font-family: 'El Messiri', Georgia, serif; }
+.old-tv .game-choice { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.old-tv .game-choice > * + * { margin-top: 14px; }
+.old-tv .game-card h2, .old-tv .game-card__copy, .old-tv .results__player { word-wrap: break-word; }
+.old-tv .game-card[aria-hidden='true'] { visibility: hidden; }
+.old-tv .game-notice { width: 520px; max-width: 90%; margin: 0 auto; }
+.old-tv .results-screen__scroll { padding-bottom: 150px; }
+.old-tv .results { width: calc(100% - 120px); margin: 0 auto; padding-top: 40px; }
+.old-tv .results__player { width: calc(33.333% - 20px); margin: 0 10px 30px; }
+@media (max-width: 1100px) {
+  .old-tv .player-card, .old-tv .pack-card { width: calc(50% - 20px); flex-basis: calc(50% - 20px); }
+  .old-tv .results__player { width: calc(50% - 20px); }
+}
+@media (min-width: 1325px) {
+  .old-tv .player-card, .old-tv .pack-card { width: calc(33.333% - 20px); flex-basis: calc(33.333% - 20px); }
+}

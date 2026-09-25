@@ -6,6 +6,8 @@ test('production output has valid /tod/ PWA metadata and no development material
   await page.goto('./')
   await expect(page).toHaveURL(/\/tod\/$/)
   await expect(page.getByRole('heading', { name: 'Правда или Действие' })).toBeVisible()
+  await expect(page.locator('html')).not.toHaveClass(/old-tv/)
+  await expect(page.locator('link[rel="stylesheet"][href*="old-tv"]')).toHaveCount(0)
 
   const manifest = await page.evaluate(async () => {
     const href = document.querySelector<HTMLLinkElement>('link[rel="manifest"]')?.href
@@ -43,8 +45,10 @@ test('production output has valid /tod/ PWA metadata and no development material
     .filter((file) => /\.(?:html|js|css|webmanifest)$/.test(file))
     .map((file) => readFileSync(join('dist', file), 'utf8'))
     .join('\n')
-  expect(runtimeText).not.toContain('/truth-or-dare/')
-  expect(runtimeText).not.toContain('localhost')
+  expect(runtimeText.includes('/truth-or-dare/')).toBe(false)
+  // The URL polyfill recognizes the literal hostname "localhost" itself.
+  // Reject actual development URLs, not that standard URL parsing branch.
+  expect(/https?:\/\/(?:localhost|127\.0\.0\.1)(?=[:/])/.test(runtimeText)).toBe(false)
 
   const workflow = readFileSync('.github/workflows/deploy-pages.yml', 'utf8')
   for (const required of ['actions/checkout@v4', 'actions/setup-node@v4', 'npm ci', 'npm run build', 'actions/upload-pages-artifact@v3', 'actions/deploy-pages@v4']) {
@@ -88,6 +92,82 @@ test('legacy bundle starts and plays without Array.at or dynamic viewport units'
     await page.getByRole('button', { name: 'Готово' }).focus()
     await page.keyboard.press('Enter')
     await expect(page.getByRole('heading', { name: 'Игрок 2' })).toBeVisible()
+    expect(errors).toEqual([])
+  } finally {
+    await context.close()
+  }
+})
+
+test('webOS 3 compatibility renders without CSS variables, Grid and newer DOM APIs', async ({ browser, baseURL }, testInfo) => {
+  test.setTimeout(90_000)
+  const context = await browser.newContext({ baseURL, serviceWorkers: 'block', viewport: { width: 1280, height: 720 } })
+  try {
+    await context.addInitScript(() => {
+      CSS.supports = () => false
+      Reflect.deleteProperty(Element.prototype, 'closest')
+      Reflect.deleteProperty(Node.prototype, 'isConnected')
+      Reflect.deleteProperty(KeyboardEvent.prototype, 'key')
+      Reflect.deleteProperty(Navigator.prototype, 'serviceWorker')
+      Reflect.deleteProperty(Intl.DateTimeFormat.prototype, 'formatToParts')
+      Reflect.deleteProperty(Array.prototype, 'at')
+      Math.random = () => 0
+    })
+    await context.route('**/tod/', async (route) => {
+      const response = await route.fetch()
+      await route.fulfill({ response, body: (await response.text())
+        .replace(/<script\b[^>]*type="module"[^>]*>[\s\S]*?<\/script>/g, '')
+        .replace(/\snomodule\b/g, '') })
+    })
+    await context.route('**/*.css', async (route) => {
+      const response = await route.fetch()
+      const body = (await response.text())
+        .replace(/--[\w-]+\s*:[^;{}]*(;|(?=}))/g, '')
+        .replace(/[\w-]+\s*:[^;{}]*(?:var\(|dvh|clamp\(|min\(|max\()[^;{}]*(;|(?=}))/g, '')
+        .replace(/(?:grid[\w-]*|gap|row-gap|column-gap|inset|[\w-]+-inline[\w-]*)\s*:[^;{}]*(;|(?=}))/g, '')
+        .replace(/display:\s*(?:inline-)?grid\s*(;|(?=}))/g, '')
+      await route.fulfill({ response, body })
+    })
+    const page = await context.newPage()
+    const errors: string[] = []
+    page.on('pageerror', (error) => errors.push(error.message))
+    await page.goto('./')
+    await expect(page.getByRole('heading', { name: 'Правда или Действие' })).toBeVisible()
+    await expect(page.locator('html')).toHaveClass(/old-tv/)
+    await page.keyboard.press('ArrowDown')
+    expect(await page.evaluate(() => document.activeElement !== document.body)).toBe(true)
+    await page.getByRole('button', { name: 'Начать' }).focus()
+    await page.keyboard.press('Enter')
+    await page.getByRole('button', { name: 'Далее' }).click()
+    await page.getByRole('button', { name: 'Добавить игрока' }).click()
+    await page.getByRole('button', { name: 'Удалить последнего игрока' }).click()
+    await expect(page.getByRole('textbox', { name: 'Имя игрока' })).toHaveCount(2)
+    await page.getByRole('button', { name: 'Открыть справку о настройках игроков' }).click()
+    await expect(page.getByRole('dialog')).toBeVisible()
+    await page.getByRole('button', { name: 'Ясно' }).click()
+    await expect(page.getByRole('dialog')).not.toBeVisible()
+    for (let index = 0; index < 2; index += 1) {
+      await page.getByRole('textbox', { name: 'Имя игрока' }).nth(index).fill(`Игрок ${index + 1}`)
+      await page.getByRole('combobox', { name: 'Грань игрока' }).nth(index).selectOption('full')
+    }
+    await page.screenshot({ path: testInfo.outputPath('old-tv-players.png') })
+    await page.getByRole('button', { name: 'Далее' }).click()
+    await page.getByRole('checkbox', { name: 'Другие люди' }).check({ force: true })
+    await page.getByRole('button', { name: 'Далее' }).click()
+    await page.getByRole('button', { name: 'Действие', exact: true }).focus()
+    await page.keyboard.press('Enter')
+    const before = await persistedGame(page)
+    expect(before.currentTurn?.phoneNumber).toMatch(/^\+7 \(9\d{2}\) \d{3}-\d{2}-\d{2}$/)
+    await page.screenshot({ path: testInfo.outputPath('old-tv-game.png') })
+    const card = await page.locator('.game-card:not([aria-hidden])').boundingBox()
+    expect(card && card.width > 400 && card.height > 300).toBe(true)
+    await page.reload()
+    await page.getByRole('button', { name: 'Продолжить' }).click()
+    expect(await persistedGame(page)).toEqual(before)
+    await page.getByRole('button', { name: 'Готово' }).focus()
+    await page.keyboard.press('Enter')
+    await expect(page.getByRole('heading', { name: 'Игрок 2' })).toBeVisible()
+    await finishGame(page)
+    await expect(page.getByRole('heading', { name: 'Результаты' })).toBeVisible()
     expect(errors).toEqual([])
   } finally {
     await context.close()

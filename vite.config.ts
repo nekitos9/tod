@@ -2,15 +2,19 @@ import react from '@vitejs/plugin-react'
 import legacy from '@vitejs/plugin-legacy'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import { legacyPolyfillsES5 } from './scripts/legacy-polyfills-plugin.ts'
 
 export default defineConfig({
   base: '/tod/',
-  // webOS 6.x (including LG 43UP76906LE) uses Chromium 79.
-  build: { cssTarget: 'chrome79' },
+  // webOS 3.x uses Chromium 38; webOS 6.x uses Chromium 79.
+  // The default minifier can reintroduce ES2015 syntax after Babel's ES5 pass.
+  build: { cssTarget: 'chrome38', minify: 'terser', terserOptions: { ecma: 5 } },
   plugins: [
     react(),
-    legacy({ targets: ['chrome >= 79'] }),
+    legacy({ targets: ['chrome >= 38'] }),
+    legacyPolyfillsES5(),
     VitePWA({
+      integration: { closeBundleOrder: 'post' },
       injectRegister: null,
       manifest: {
         background_color: '#427cbe',

@@ -10,10 +10,12 @@ export function isPhoneDaytime(timeZones: readonly string[], now: Date): boolean
     try {
       let formatter = formatters.get(timeZone)
       if (!formatter) {
-        formatter = new Intl.DateTimeFormat('en-GB', { timeZone, hour: '2-digit', hourCycle: 'h23' })
+        formatter = new Intl.DateTimeFormat('en-GB', { timeZone, hour: '2-digit', hour12: false })
         formatters.set(timeZone, formatter)
       }
-      const hour = Number(formatter.formatToParts(now).find((part) => part.type === 'hour')?.value)
+      // formatToParts is missing on webOS 3.x. Formatting only the hour also
+      // works there; some Intl versions represent midnight as 24.
+      const hour = Number(formatter.format(now)) % 24
       return hour >= 9 && hour < 21
     } catch {
       // Older browsers may lack a timezone; do not treat it as the user's zone.
